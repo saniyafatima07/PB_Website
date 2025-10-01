@@ -27,6 +27,11 @@ jobs:
         run: npm install
 
       - name: Build the project
-        run: npm run build
-        env:
-          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}" ]; then
+            echo "Running build with Firebase credentials"
+            FIREBASE_SERVICE_ACCOUNT_JSON='${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' npm run build
+          else
+            echo "No Firebase credentials found (PR from fork). Using dummy config."
+            FIREBASE_SERVICE_ACCOUNT_JSON='{}' npm run build
+          fi
